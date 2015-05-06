@@ -143,7 +143,7 @@ var cascadeSelect = Overlay.extend({
   },
 
   initAttrs: function (config) {
-    multiTabSelect.superclass.initAttrs.call(this, config);
+    cascadeSelect.superclass.initAttrs.call(this, config);
 
     var trigger = this.get('trigger'),
       newTrigger = $(this.get('triggerTpl')).addClass(getClassName(this.get('classPrefix'), this.get('triggerClass')));
@@ -168,11 +168,11 @@ var cascadeSelect = Overlay.extend({
     this._initHeight();
     this._blurHide(this.get('trigger'));
     this.setTriggerContent(this.get('inFilter').call(this, this.get('value')));
-    multiTabSelect.superclass.setup.call(this);
+    cascadeSelect.superclass.setup.call(this);
   },
 
   render: function () {
-    multiTabSelect.superclass.render.call(this);
+    cascadeSelect.superclass.render.call(this);
     this._setTriggerWidth();
     return this;
   },
