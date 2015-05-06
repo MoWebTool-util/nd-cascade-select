@@ -1,0 +1,15 @@
+<div class="{{classPrefix}}">
+    <div class="{{classPrefix}}-tab" data-role="tab">
+
+      {{#each tabs}}
+          <a href="javascript:void(0)" data-role="select-tab">{{text}}</a>
+      {{/each}}
+
+    </div>
+    <div class="{{classPrefix}}-content" data-role="content">
+      {{#each tabs}}
+          <div class="{{@root.classPrefix}}-wrap {{@root.classPrefix}}-{{role}}" data-role="{{role}}">
+          </div>
+      {{/each}}
+    </div>
+</div>
