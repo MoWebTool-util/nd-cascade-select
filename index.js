@@ -279,13 +279,15 @@ var cascadeSelect = Overlay.extend({
 
 
   _setTriggerWidth: function () {
-    var trigger = this.get('trigger');
+    var trigger = this.get('trigger'),
+      elementWidth=this.element.outerWidth(),
+      triggerOutWidth=trigger.outerWidth();
 
-    trigger.css('width', this.element.outerWidth());
+    trigger.css('width', elementWidth);
 
     // 因为 trigger 的宽度可能受 CSS（如 max-width） 限制，
     // 最后将 element 的宽度设置为与 trigger 等宽
-    this.element.css('width', trigger.outerWidth());
+    this.element.css('width', triggerOutWidth>elementWidth?triggerOutWidth:elementWidth);
   },
 
   _setHeight: function () {
