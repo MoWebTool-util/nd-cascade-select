@@ -1,14 +1,13 @@
 /**
- * @module: nd-cascade-select
- * @author: lzhengms <lzhengms@gmail.com> - 2015-05-04 15:11:38
+ * @module CascadeSelect
+ * @author lzhengms <lzhengms@gmail.com>
  */
 
 'use strict';
 
-
-var $ = require('jquery'),
-  Overlay = require('nd-overlay'),
-  Template = require('nd-template');
+var $ = require('jquery');
+var Overlay = require('nd-overlay');
+var Template = require('nd-template');
 
 var tpl = {
   partial: require('./src/options.handlebars'),
@@ -27,8 +26,10 @@ function getClassName(classPrefix, className) {
 //sort
 
 function quickSort(key) {
-  return function (arr) {
-    if (arr.length <= 1) return arr;
+  return function(arr) {
+    if (arr.length <= 1) {
+      return arr;
+    }
     var left = [];
     var right = [];
     var proitIndex = Math.floor(arr.length / 2);
@@ -41,23 +42,13 @@ function quickSort(key) {
       }
     }
     return quickSort(key)(left).concat(proit, quickSort(key)(right));
-  }
+  };
 }
-
-// 高度
-function getWrapHeight(wrap) {
-  var height = 0;
-  wrap.find('a').each(function (index, item) {
-    height += $(item).outerHeight();
-  });
-  return height;
-}
-
 
 //'{"province":"福建省","provinceCode":"350000","city":"莆田市","cityCode":"350300","district":"仙游县","districtCode":"350322"}'
-var cascadeSelect = Overlay.extend({
+var CascadeSelect = Overlay.extend({
 
-  Implements: Template,
+  Implements: [Template],
 
   attrs: {
     classPrefix: 'tab-select',
@@ -68,11 +59,11 @@ var cascadeSelect = Overlay.extend({
 
     trigger: {
       value: null,
-      getter: function (val) {
+      getter: function(val) {
         return $(val).eq(0);
       }
     },
-    triggerTpl: '<a href="#"></a>',
+    triggerTpl: '<a href="javascript:;"></a>',
 
     template: tpl.template,
     partial: tpl.partial,
@@ -80,9 +71,7 @@ var cascadeSelect = Overlay.extend({
     align: {
       baseXY: [0, '100%-1px']
     },
-    maxHeight: null,
     delimiter: '/',
-
 
     data: null,
     tabs: null,
@@ -90,14 +79,13 @@ var cascadeSelect = Overlay.extend({
 
     value: {
       value: null,
-      getter: function () {
-
+      getter: function() {
         var trigger = this.get('originTrigger')[0];
         return trigger.value || trigger.placeholder;
       },
-      setter: function (val) {
+      setter: function(val) {
 
-        if (typeof val === 'object' || $.isArray(val)) {
+        if (typeof val === 'object' || Array.isArray(val)) {
           val = JSON.stringify(val);
         }
 
@@ -106,44 +94,44 @@ var cascadeSelect = Overlay.extend({
       }
     },
 
-    inFilter: function (value) {
+    inFilter: function(value) {
       return value;
     },
 
-    outFilter: function (data) {
+    outFilter: function(data) {
       return data;
     },
 
-    outValues: function (list) {
+    outValues: function() {
       return this.getValues().splice(-1);
     }
   },
 
   events: {
-    'click [data-role=select-tab]': function (e) {
+    'click [data-role="select-tab"]': function(e) {
       var target = $(e.currentTarget),
         index = target.index();
       this.set('index', index);
     },
-    'click [data-role=select-item]': function (e) {
+    'click [data-role="select-item"]': function(e) {
       var target = $(e.currentTarget),
         selectedClass = getClassName(this.get('classPrefix'), this.get('itemSelectedClass'));
       target.siblings().removeClass(selectedClass);
       target.addClass(selectedClass);
       this.select(target);
     },
-    'mouseenter [data-role=select-item]': function (e) {
+    'mouseenter [data-role="select-item"]': function(e) {
       var target = $(e.currentTarget);
-      target.addClass(getClassName(this.get('classPrefix'), this.get('itemHoverClass')))
+      target.addClass(getClassName(this.get('classPrefix'), this.get('itemHoverClass')));
     },
-    'mouseleave [data-role=select-item]': function (e) {
+    'mouseleave [data-role="select-item"]': function(e) {
       var target = $(e.currentTarget);
-      target.removeClass(getClassName(this.get('classPrefix'), this.get('itemHoverClass')))
+      target.removeClass(getClassName(this.get('classPrefix'), this.get('itemHoverClass')));
     }
   },
 
-  initAttrs: function (config) {
-    cascadeSelect.superclass.initAttrs.call(this, config);
+  initAttrs: function(config) {
+    CascadeSelect.superclass.initAttrs.call(this, config);
 
     var trigger = this.get('trigger'),
       newTrigger = $(this.get('triggerTpl')).addClass(getClassName(this.get('classPrefix'), this.get('triggerClass')));
@@ -159,26 +147,23 @@ var cascadeSelect = Overlay.extend({
     this.set('model', {
       tabs: this.get('tabs')
     });
-
   },
 
-  setup: function () {
+  setup: function() {
     this._bindEvents();
     this._alignDefaultValue();
-    this._initHeight();
     this._blurHide(this.get('trigger'));
     this.setTriggerContent(this.get('inFilter').call(this, this.get('value')));
-    cascadeSelect.superclass.setup.call(this);
+    CascadeSelect.superclass.setup.call(this);
   },
 
-  render: function () {
-    cascadeSelect.superclass.render.call(this);
+  render: function() {
+    CascadeSelect.superclass.render.call(this);
     this._setTriggerWidth();
     return this;
   },
 
-  select: function (target) {
-
+  select: function(target) {
     var that = this,
       value = target.data('id'),
       text = target.text(),
@@ -187,11 +172,10 @@ var cascadeSelect = Overlay.extend({
       next = index + 1,
       selectList = this.get('selected') || [];
 
-
-    $.each(selectList, function (i, item) {
+    selectList.some(function(item, i) {
       if (item.index === index) {
         selectList.splice(i, 1);
-        return false;
+        return true;
       }
     });
 
@@ -204,7 +188,7 @@ var cascadeSelect = Overlay.extend({
     //对selectList按照index排序
     selectList = quickSort('index')(selectList);
     this.set('length', next);
-    next >= length ? this.hide() : (function () {
+    next >= length ? this.hide() : (function() {
       //选了除了最后一个面板都要
       selectList.splice(next, length - next);
       //清空后面的板块内容
@@ -226,7 +210,7 @@ var cascadeSelect = Overlay.extend({
   },
 
   //set回调
-  _onRenderIndex: function (index) {
+  _onRenderIndex: function(index) {
     var wraps = this._getWraps(),
       tabs = this._getTabs(),
       curTab = tabs.eq(index);
@@ -235,85 +219,67 @@ var cascadeSelect = Overlay.extend({
     curTab.siblings().removeClass(getClassName(this.get('classPrefix'), this.get('titleActiveClass')));
     wraps.hide();
     wraps.eq(index).show();
-    this._setHeight();
   },
 
-  _onRenderData: function (data) {
+  _onRenderData: function(data) {
     var model = this.get('model');
     model.list = data || [];
     this._getWraps().eq(this.get('index')).html(this.get('partial')(model));
-    this._setHeight();
   },
 
-  _onRenderSelected: function (list) {
-    var values = [], texts = [];
-    $.each(list, function (i, item) {
+  _onRenderSelected: function(list) {
+    var values = [],
+      texts = [];
+
+    list.forEach(function(item) {
       values.push(item.value);
       texts.push(item.text);
     });
+
     this.set('values', values);
     this.set('texts', texts);
+
     //处理成自己想要的数据格式
     this.get('outFilter').call(this, list);
   },
 
   //私有方法
-  _getWraps: function () {
-    return this.$('[data-role=content]').children('div');
+  _getWraps: function() {
+    return this.$('[data-role="content"]').children('div');
   },
 
-  _getTabs: function () {
-    return this.$('[data-role=select-tab]');
+  _getTabs: function() {
+    return this.$('[data-role="select-tab"]');
   },
 
-  _bindEvents: function () {
-    this.delegateEvents(this.get('trigger'), 'click', function (e) {
+  _bindEvents: function() {
+    this.delegateEvents(this.get('trigger'), 'click', function(e) {
       e.preventDefault();
       this.get('visible') ? this.hide() : this.show();
     });
   },
 
-  _alignDefaultValue: function () {
+  _alignDefaultValue: function() {
     this.get('align').baseElement = this.get('trigger');
   },
 
-
-  _setTriggerWidth: function () {
-
+  _setTriggerWidth: function() {
     var trigger = this.get('trigger'),
-      elementWidth=this.element.outerWidth(),
-      triggerOutWidth=trigger.outerWidth(),
-      width=triggerOutWidth>elementWidth?triggerOutWidth:elementWidth;
+      elementWidth = this.element.outerWidth(),
+      triggerOutWidth = trigger.outerWidth(),
+      width = triggerOutWidth > elementWidth ? triggerOutWidth : elementWidth;
 
     trigger.css('width', width);
 
     // 因为 trigger 的宽度可能受 CSS（如 max-width） 限制，
     // 最后将 element 的宽度设置为与 trigger 等宽
-    this.element.css('width',width);
-  },
-
-  _setHeight: function () {
-    var maxHeight = this.get('maxHeight');
-
-    if (maxHeight) {
-      var wrap = this._getWraps().eq(this.get('index'));
-      var height = getWrapHeight(wrap);
-
-      this.$('[data-role=content]').css('height', height > maxHeight ? maxHeight : '');
-      wrap.scrollTop(0);
-    }
-  },
-
-  _initHeight: function () {
-    this.after('show', function () {
-      this._setHeight();
-    });
+    this.element.css('width', width);
   },
 
   //接口方法
-  setTriggerContent: function (text) {
+  setTriggerContent: function(text) {
     var trigger = this.get('trigger'),
-      con = trigger.find('[data-role=content]');
+      con = trigger.find('[data-role="content"]');
     if (con && con.length) {
       con.html(text);
     } else {
@@ -321,19 +287,19 @@ var cascadeSelect = Overlay.extend({
     }
   },
 
-  getValues: function () {
+  getValues: function() {
     return this.get('values');
   },
 
-  getTexts: function () {
+  getTexts: function() {
     return this.get('texts');
   },
 
-  getSelected: function () {
+  getSelected: function() {
     return this.get('selected');
   },
 
-  setValues: function () {
+  setValues: function() {
     //设置要显示的数据和提交的数据
     this.setTriggerContent(this.getTexts().join(this.get('delimiter')));
     //必须全部选择了才设置值
@@ -344,5 +310,4 @@ var cascadeSelect = Overlay.extend({
 
 });
 
-
-module.exports = cascadeSelect;
+module.exports = CascadeSelect;
