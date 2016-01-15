@@ -204,7 +204,7 @@ var CascadeSelect = Overlay.extend({
       that.trigger('setData', next, value);
     })();
 
-    this.set('selected', selectList);
+    this.set('selected', selectList.slice(0));
 
     this.setValues();
   },
